@@ -1,0 +1,20 @@
+[
+  {
+    "nome": "Pedro",
+    "idade": 20,
+    "altura": 1.7,
+    "peso": 72.0
+  },
+  {
+    "nome": "Evaristo",
+    "idade": 41,
+    "altura": 1.74,
+    "peso": 87.7
+  },
+  {
+    "nome": "Nintendo Switch",
+    "idade": 92,
+    "altura": 1.51,
+    "peso": 154.6
+  }
+]
