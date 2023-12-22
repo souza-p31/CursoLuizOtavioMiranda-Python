@@ -32,132 +32,166 @@ Só será possível sacar se passar na autenticação do banco (descrita acima)
 Banco autentica por um método.
 """
 from abc import ABC, abstractmethod
-
 # Conta (ABC)
 #     ContaCorrente
 #     ContaPoupanca
-"""Criar classes ContaPoupanca e ContaCorrente que herdam de Conta
-    ContaCorrente deve ter um limite extra
-    Contas têm agência, número da conta e saldo
-    Contas devem ter método para depósito
-    Conta (super classe) deve ter o método sacar abstrato (Abstração e
-    polimorfismo - as subclasses que implementam o método sacar)"""
+# Criar classes ContaPoupanca e ContaCorrente que herdam de Conta
+#     ContaCorrente deve ter um limite extra
+#     Contas têm agência, número da conta e saldo
+#     Contas devem ter método para depósito
+#     Conta (super classe) deve ter o método sacar abstrato (Abstração e
+#     polimorfismo - as subclasses que implementam o método sacar)
 
 class Conta(ABC):
-    def __init__(self, agencia, conta):
+    def __init__(self, agencia, conta) -> None:
         self._agencia = agencia
         self._conta = conta
-        self._clientes = []
-
-    @abstractmethod
-    def agencia_conta():
-        ...
-
-    @abstractmethod
-    def depositar():
-        ...
-
-    @abstractmethod
-    def sacar():
-        ...
-
-    @abstractmethod
-    def saldo():
-        ...
-
-class ContaPoupança(Conta):
-    def __init__(self, agencia, conta):
-        super().__init__(agencia, conta)
         self._saldo = 0
 
+    @abstractmethod
+    def depositar(self, valor):
+        ...
 
-    def agencia_conta(self):
-        print(f'Ag: {self._agencia} Ct: {self._conta}')
-        return
+    @abstractmethod
+    def sacar(self, valor):
+        ...
+
+    @abstractmethod
+    def saldo(self):
+        ...
+
+class ContaPoupanca(Conta):
+    def __init__(self, agencia, conta):
+        super().__init__(agencia, conta)
 
 
     def depositar(self, valor):
+        print(f'Deposito de R${valor} realizado!')
         self._saldo += valor
-        print(f'Depósito de R${valor} realizado!')
         return
-
+    
 
     def sacar(self, valor):
-        self._saldo -= valor
         print(f'Saque de R${valor} realizado!')
+        self._saldo -= valor
         return
-
     
+
     def saldo(self):
-        print(f'Seu saldo atual é R${self._saldo}')
-        return
+        print(f'Seu saldo é R${self._saldo}')
+        return 
 
 class ContaCorrente(Conta):
     def __init__(self, agencia, conta):
         super().__init__(agencia, conta)
-        self._saldo = 100
-
-
-    def agencia_conta(self):
-        print(f'Ag: {self._agencia} Ct: {self._conta}')
-        return
+        self._saldo = 150
 
 
     def depositar(self, valor):
+        print(f'Deposito de R${valor} realizado!')
         self._saldo += valor
-        print(f'Depósito de R${valor} realizado!')
         return
-
+    
 
     def sacar(self, valor):
-        self._saldo -= valor
         print(f'Saque de R${valor} realizado!')
+        self._saldo -= valor
         return
 
-    
+
     def saldo(self):
-        print(f'Seu saldo atual é R${self._saldo}')
-
+        print(f'Seu saldo é R${self._saldo}')
+        return 
     
 
-# Pessoa (ABC)
+    
+    # Pessoa (ABC)
 #     Cliente
 #         Clente -> Conta
 # Criar classe Cliente que herda da classe Pessoa (Herança)
 #     Pessoa tem nome e idade (com getters)
 #     Cliente TEM conta (Agregação da classe ContaCorrente ou ContaPoupanca)
-
 class Pessoa(ABC):
-    def __init__(self, nome, idade) -> None:
-         self._nome = nome
-         self._idade = idade
-    
-class Cliente(Pessoa):
-    def __init__(self, nome, idade) -> None:
-        super().__init__(nome, idade)
+    def __init__(self, nome, idade):
+        self._nome = nome
+        self._idade = idade
 
-    
+
     @property
     def nome(self):
-        print(self._nome)
-        return 
+        return self._nome
     
 
     @property
     def idade(self):
-        print(self._idade)
-        return
+        return self._idade
     
-
-cliente_pedro = Cliente('Pedro', 21)
-cliente_pedro.nome
-cliente_pedro.idade
-print()
-
-conta_poupanca = ContaPoupança('1234', '654987')
-conta_poupanca.agencia_conta()
-print()
-
+class Cliente(Pessoa):
+    def __init__(self, nome, idade):
+        super().__init__(nome, idade)
+    
 # Banco
 #     Banco -> Cliente
 #     Banco -> Conta
+# Criar classe Banco para AGREGAR classes de clientes e de contas (Agregação)
+# Banco será responsável autenticar o cliente e as contas da seguinte maneira:
+#     Banco tem contas e clentes (Agregação)
+#     * Checar se a agência é daquele banco
+#     * Checar se o cliente é daquele banco
+#     * Checar se a conta é daquele banco
+# Só será possível sacar se passar na autenticação do banco (descrita acima)
+# Banco autentica por um método.
+
+class Banco:
+    def __init__(self, nome, cliente, conta) -> None:
+        self._nome = nome
+        self._cliente = cliente
+        self._conta = conta
+        self._agencias = []
+        self._contas = []
+        self._clientes = []
+
+    def cadastrar_cliente(self):
+        cliente_novo = self._cliente
+        self._clientes.append(cliente_novo.nome)
+        print(f'{cliente_novo.nome} cadastrado com sucesso!')
+        return cliente_novo
+    
+    def cadastrar_conta(self):
+        self._agencias.append((self._conta._agencia))
+        self._contas.append((self._conta._conta))
+        print(f'Conta nova cadastrada com sucesso!\nAg: {self._conta._agencia} Ct: {self._conta._conta}')
+        return
+    
+
+    def depositar(self, valor, agencia, conta, nome):
+        if agencia in self._agencias and conta in self._contas and nome in self._clientes:
+            self._conta.depositar(valor)
+        else:
+            print('Acesso negado!')
+
+    def sacar(self, valor, agencia, conta, nome):
+        if agencia in self._agencias and conta in self._contas and nome in self._clientes:
+            self._conta.sacar(valor)
+        else:
+            print('Acesso negado!')
+
+    def saldo(self, agencia, conta, nome):
+        if agencia in self._agencias and conta in self._contas and nome in self._clientes:
+            self._conta.saldo()
+        else:
+            print('Acesso negado!')
+    
+
+cliente_mirella = Cliente('Mirella', 15)
+
+conta_corrente_mirella = ContaCorrente('1234','5678')
+
+banco_nubank = Banco('Nubank', cliente_mirella, conta_corrente_mirella)
+
+banco_nubank.cadastrar_cliente()
+banco_nubank.cadastrar_conta()
+
+conta_corrente_mirella.depositar(9999999999)
+conta_corrente_mirella.sacar(8)
+conta_corrente_mirella.saldo()
